@@ -1,15 +1,41 @@
 "use client"
+import Link from 'next/link';
 import { useState, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+  const router = useRouter()
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica de autenticación
-    console.log('Email:', email);
-    console.log('Contraseña:', password);
+
+    const datos = {
+      email,
+      password
+    }
+
+    try {
+      const response = await fetch("/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({datos})
+      })
+
+      if(response.ok){
+        alert("Ha iniciado correctamente")
+        router.push("/dashboard")
+      }else{
+        alert("Error al iniciar sesión")
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
@@ -67,6 +93,13 @@ export default function Login() {
             </div>
           </form>
         </div>
+      </div>
+
+      {/* Enlace o botón para ir a la página de registro */}
+      <div className="mt-4 text-center">
+        <Link href="/register" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          ¿No tienes una cuenta? Regístrate
+        </Link>
       </div>
     </div>
   );
